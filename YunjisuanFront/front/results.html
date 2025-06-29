@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>LeetcodeResults</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="UTF-8" />
+	<link rel="icon" href="/public/favicon-16x16.png" />
+	<link rel="icon" href="/public/favicon-16x16.png" />
+	<link rel="stylesheet" href="/src/assets/main.css" />
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js"></script>
+</head>
+
+<body>
+	<div id="app">
+		<div class="search-container-results">
+			<div class="logo-container-results">
+				<img src="/public/leetcode.png" alt="Logo" class="logo-results" />
+			</div>
+			<div class="search-box-results">
+				<input type="text" v-model="searchQuery" @keydown.enter="search" placeholder="have fun!">
+				<img class="search-icon-results" src="/public/icon_search.svg" alt="Magnifying Glass" />
+			</div>
+			<div id="titleitem">
+				<div class="title-div" v-for="item in jsonData" :key="item.id" @click="handleClick(item.url)">
+					<div class="title-info">
+						<span class="title">{{ item.id }}. {{ item.title }}</span>
+						<span class="times">count: {{ item.times }}</span>
+						<div class="tags">
+							<span class="tag1">Algorithm_label: {{ item.algorithm_label }}</span>
+							<span class="tag2">Difficulty: {{ item.difficulty }}</span>
+						</div>
+						<div class="status">
+							<span class="times">{{ item.status_info }}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<script>
+				new Vue({
+					el: '#app',
+					data: {
+						searchQuery: '',
+						jsonData: []
+					},
+					created() {
+						// 从 URL 获取搜索词并执行搜索
+						const urlParams = new URLSearchParams(window.location.search);
+						this.searchQuery = urlParams.get('search') || '';
+						if (this.searchQuery) {
+							this.search();
+						}
+					},
+					methods: {
+						handleClick(url) {
+							window.location.href = url;
+						},
+						search() {
+							if (!this.searchQuery) return;
+
+							// 使用注入的环境变量或默认值
+							const backendUrl = window.BACKEND_URL || 'http://localhost:9999';
+							console.log('BACKEND_URL:', backendUrl);
+
+							// 使用后端的兼容路由
+							axios.get(`${backendUrl}/results.html?search=${this.searchQuery}`)
+								.then(response => {
+									console.log('Search results:', response.data);
+									this.jsonData = response.data;
+
+									// 更新 URL，但不重新加载页面
+									const newUrl = `results.html?search=${this.searchQuery}`;
+									window.history.pushState({ path: newUrl }, '', newUrl);
+								})
+								.catch(error => {
+									console.error('Search error:', error);
+									console.error('Error details:', error.response);
+									if (error.response && error.response.status === 404) {
+										alert('没有您想要的资源，请重新搜索');
+									} else {
+										alert('网络连接错误，请检查后端服务');
+									}
+								});
+						}
+					}
+				});
+			</script>
+</body>
+
+</html>

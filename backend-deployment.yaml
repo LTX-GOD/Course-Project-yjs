@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yunjisuan-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yunjisuan-backend
+  template:
+    metadata:
+      labels:
+        app: yunjisuan-backend
+    spec:
+      containers:
+      - name: yunjisuan-backend
+        image: yunjisuan-backend:latest
+        imagePullPolicy: Never  # 使用本地镜像
+        ports:
+        - containerPort: 9999
+        env:
+        - name: DB_PATH
+          value: "/app/data/questions.db"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: NODE_ENV
+          value: "production"
+        volumeMounts:
+        - name: data-volume
+          mountPath: /app/data
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: yunjisuan-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yunjisuan-backend-service
+spec:
+  selector:
+    app: yunjisuan-backend
+  ports:
+  - port: 9999
+    targetPort: 9999
+  type: ClusterIP

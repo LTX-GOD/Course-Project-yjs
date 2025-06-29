@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Leetcode Search Box</title>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="/public/favicon-16x16.png" />
+  <link rel="stylesheet" href="/src/assets/main.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <div class="search-container">
+      <div class="logo-container">
+        <img src="/public/leetcode.png" alt="Logo" class="logo" />
+      </div>
+      <div class="search-box">
+        <input type="text" v-model="searchText" @keydown.enter="search" placeholder="请输入想要搜索的题目" />
+        <img class="search-icon" src="/public/icon_search.svg" alt="Magnifying Glass" />
+        <button class="search-button" @click="search">搜索</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        searchText: ''
+      },
+      methods: {
+        search() {
+          if (!this.searchText) return;
+
+          // 直接跳转到结果页面
+          window.location.href = `results.html?search=${encodeURIComponent(this.searchText)}`;
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>
